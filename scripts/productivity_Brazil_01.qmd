@@ -1,0 +1,157 @@
+---
+title: "Stagnant Brazil? The End of the Demographic Dividend and the Middle-Income Trap"
+author: "Mateus Pires Teodoro"
+format: 
+  pdf:
+    theme: flatly
+    toc: true
+    toc-title: "Table of Contents"
+    fig-pos: "H"
+    tbl-pos: "H"
+execute:
+  warning: false
+  message: false
+  echo: false
+---
+```{r}
+#| label: setup
+#| include: false
+
+# List of project dependencies
+required_packages <- c("tidyverse", "ipeadatar", "knitr", "kableExtra")
+
+# Check for missing packages and install them automatically
+missing_packages <- required_packages[!(required_packages %in% installed.packages()[,"Package"])]
+if(length(missing_packages)) install.packages(missing_packages)
+
+# Load all libraries cleanly
+invisible(lapply(required_packages, library, character.only = TRUE))
+```
+
+## 1. Introduction: The Illusion of Growth
+
+Until recently, Brazil relied on a valuable economic advantage: its demographic dividend. Historically, our economic growth relied almost exclusively on the abundant incorporation of labor. There was an increasing proportion of young people entering the labor market to support a smaller proportion of inactive individuals.
+
+However, evidence from recent data indicates that this development model based on simple "labor force accumulation" has been exhausted, and unfortunately, we failed to seize the opportunity. If Brazil does not get rich now, it will grow old poor.
+
+## 2. The Demographic Turning Point: The Growth Constraint
+
+The Demographic Dependency Ratio (DDR) measures the proportion of the inactive population (children aged 0 to 14 and elderly over 65) relative to the potentially productive population (15 to 64 years old). This indicator was chosen over labor market-focused metrics, such as the Economically Active Population (EAP), because it mitigates the short-term effects of economic cycle fluctuations. The DDR allows us to observe the "installed capacity" and the maximum physical limit of the Brazilian workforce, free from cyclical noise.
+
+Analyzing the continuous PNAD time series, we observe the formation of a clear "U" curve. The year 2017 marked the historical minimum of this indicator and a definitive inflection point. From that moment on, the trend reversed: driven by population aging, the proportion of dependents began to grow again. Brazil has closed its demographic dividend window.
+
+```{r}
+#| fig-align: center
+#| fig-width: 8
+#| fig-height: 4
+
+# Demographic data from the IPEA cloud
+razao_dependencia <- ipeadata("ADH12_RAZDEP") %>%
+  filter(uname == "Brazil") %>% 
+  select(date, razao_dep = value) %>%
+  mutate(
+    date = as.numeric(format(as.Date(date), "%Y")),
+    razao_dependencia_pct = razao_dep * 100 
+  )
+
+# Plotting the chart
+ggplot(razao_dependencia, aes(x = date, y = razao_dependencia_pct)) +
+  geom_line(linewidth = 1.2, color = "darkred") + 
+  geom_point(size = 2, color = "darkred") +
+  labs(
+    title = "The Demographic Turning Point: Dependency Ratio in Brazil",
+    subtitle = "Inactive population (0-14 and 65+ years) per 100 working-age people",
+    x = "Year",
+    y = "Dependency Ratio (%)",
+    caption = "Source: Elaborated with IBGE/PNAD data via Ipeadata."
+  ) +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold", size = 14))
+```
+
+## 3. The Stalled Engine: The Productivity Failure
+
+The World Bank's World Development Report 2024 warns that, in the face of aging, middle-income countries can no longer rely on the simple addition of the labor force; it is imperative to transition to growth via technological infusion and efficiency.
+
+However, since 2013, the real productivity of the Brazilian worker has not moved: we have been stuck in the range of R\$ 45,000 annually (at constant prices). Each worker produces the same volume of wealth to be divided among increasingly more dependents. Brazil has failed to generate the efficiency leap necessary to compensate for its aging.
+
+```{r}
+#| fig-align: center
+#| fig-width: 8
+#| fig-height: 4
+
+# Downloading GDP and Employment data
+tabela_produtividade <- ipeadata("SCN10_PIBP10") %>%
+  select(date, pib = value) %>%
+  inner_join(ipeadata("PAN_PO") %>% select(date, ocupados = value), by = "date") %>%
+  mutate(produtividade_trabalho = pib / ocupados)
+
+ggplot(tabela_produtividade, aes(x = date, y = produtividade_trabalho)) +
+  geom_line(linewidth = 1.2, color = "darkblue") +
+  geom_point(size = 2, color = "darkblue") +
+  scale_y_continuous(limits = c(0, 100), labels = scales::comma) +
+  labs(
+    title = "Evolution of Labor Productivity in Brazil",
+    subtitle = "Real GDP at 2010 prices divided by the total number of employed persons",
+    x = "Year",
+    y = "Productivity (R$ thousands per worker)",
+    caption = "Source: Elaborated with IBGE/SCN and Continuous PNAD data via Ipeadata."
+  ) +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold", size = 14))
+```
+
+## 4. Global Benchmark and the Institutional Abyss
+
+To understand the severity of this stagnation, we established a global control group: Chile as a regional mirror in commodity dependence; Poland and South Korea, which broke the middle-income trap through integration into global value chains and elite human capital; and Vietnam, which is experiencing its demographic peak based on technological infusion (serving as an example of truly leveraging the demographic dividend, instead of generating a dependent economy as was the case in Brazil).
+
+```{r}
+#| message: false
+#| warning: false
+
+benchmark_data <- tibble(
+  Country = c("Vietnam", "Poland", "South Korea", "Chile", "Brazil"),
+  `Productivity (2013)` = c("US\\$ 14,359", "US\\$ 67,516", "US\\$ 84,089", "US\\$ 59,309", "US\\$ 41,958"),
+  `Final Productivity` = c("US\\$ 26,057", "US\\$ 92,968", "US\\$ 98,259", "US\\$ 64,104", "US\\$ 41,441"),
+  `Percentage Change` = c("+81.5%", "+37.7%", "+16.9%", "+8.09%", "-1.23%")
+)
+
+benchmark_data %>%
+  mutate(
+    `Percentage Change` = cell_spec(
+      `Percentage Change`,
+      color = ifelse(grepl("-", `Percentage Change`), "red", "green"),
+      bold = TRUE
+    )
+  ) %>%
+  kable(format = "latex", escape = FALSE, align = "c", booktabs = TRUE) %>%
+  kable_styling(latex_options = c("HOLD_position"))
+```
+
+It is clear that we are the only country on the list in the red. Why does this happen? The answer lies not in the absence of talent, but in the institutional rules of the game.
+
+As pointed out by William Baumol in his theory on the allocation of talent, the institutional framework dictates whether the brightest minds of a society will focus on innovation or rent-seeking. In Brazil, the tax complexity described by Douglass North (transaction costs) and the barriers to creative destruction (Acemoglu & Robinson) punish productive entrepreneurship. Instead of creating cutting-edge technology, our intellectual elites are incentivized to seek stability in the public sector, arbitrage the legal system, or migrate abroad.
+
+## 5. Conclusion: The Middle-Income Trap
+
+The overlap of a rapidly aging population with a worker whose capacity to generate wealth is cemented consolidates the classic scenario of the Middle-Income Trap (Gill & Kharas, 2007). With the irreversible exhaustion of the demographic dividend, Brazil urgently needs to overcome its institutional constraints to unlock technological innovation. Otherwise, the country runs the grave risk of becoming structurally old before managing to get rich.
+
+## 6. Limitations and Recommendations
+
+We recognize that the aggregate productivity index masks structural heterogeneities in the Brazilian economy. Based on this, the following next steps for the research are proposed:
+
+1.  **Sectoral Decomposition:** Use labor productivity microdata to identify which specific industries are operating as anchors on the national average, testing the technological gap against international benchmarks.
+
+2.  **Institutional Impact on Talent Allocation:** Quantitatively investigate the correlation between local transaction costs (such as tax complexity and entry barriers) and the flight of elite human capital, measuring the real cost of our laws on the capacity to innovate.
+
+## References
+
+- **ACEMOGLU, D.; ROBINSON, J. A.** *Why Nations Fail: The Origins of Power, Prosperity, and Poverty*. Crown Business, 2012.
+
+- **BAUMOL, W. J.** *Entrepreneurship: Productive, Unproductive, and Destructive*. Journal of Political Economy, 1990.
+
+- **WORLD BANK.** *World Development Report 2024: The Middle Income Trap*. Washington, DC: World Bank, 2024.
+
+- **GILL, I.; KHARAS, H.** *An East Asian Renaissance: Ideas for Economic Growth*. Washington, DC: World Bank, 2007.
+
+- **NORTH, D. C.** *Institutions, Institutional Change and Economic Performance*. Cambridge University Press, 1990.
