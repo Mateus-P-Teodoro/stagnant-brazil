@@ -3,7 +3,7 @@
 ## Project Overview
 This repository contains an empirical macroeconomic analysis investigating Brazil's structural economic stagnation. By crossing demographic trends with labor productivity metrics, this project explores how the exhaustion of the demographic dividend, combined with institutional bottlenecks, has cemented Brazil in the Middle-Income Trap. 
 
-The research was presented as a working paper at the **BRASA Summit Americas (University of Pennsylvania - Oct 2026)**.
+The research was presented as a working paper at the BRASA Summit Americas (University of Pennsylvania - Oct 2026).
 
 ## Tech Stack & Methodology
 * **Language:** R
