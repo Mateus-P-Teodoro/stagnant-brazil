@@ -3,22 +3,24 @@ title: "Stagnant Brazil? The End of the Demographic Dividend and the Middle-Inco
 author: "Mateus Pires Teodoro"
 format: 
   pdf:
-    theme: flatly
     toc: true
     toc-title: "Table of Contents"
     fig-pos: "H"
     tbl-pos: "H"
+geometry:
+  - margin=1in
 execute:
   warning: false
   message: false
   echo: false
 ---
+
 ```{r}
 #| label: setup
 #| include: false
 
 # List of project dependencies
-required_packages <- c("tidyverse", "ipeadatar", "knitr", "kableExtra")
+required_packages <- c("tidyverse", "ipeadatar", "sidrar", "knitr", "kableExtra")
 
 # Check for missing packages and install them automatically
 missing_packages <- required_packages[!(required_packages %in% installed.packages()[,"Package"])]
@@ -30,15 +32,15 @@ invisible(lapply(required_packages, library, character.only = TRUE))
 
 ## 1. Introduction: The Illusion of Growth
 
-Until recently, Brazil relied on a valuable economic advantage: its demographic dividend. Historically, our economic growth relied almost exclusively on the abundant incorporation of labor. There was an increasing proportion of young people entering the labor market to support a smaller proportion of inactive individuals.
+Until recently, Brazil relied on a valuable economic advantage: its demographic dividend. Historically, its economic growth relied almost exclusively on the abundant incorporation of labor. There was an increasing proportion of young people entering the labor market to support a smaller proportion of inactive individuals.
 
-However, evidence from recent data indicates that this development model based on simple "labor force accumulation" has been exhausted, and unfortunately, we failed to seize the opportunity. If Brazil does not get rich now, it will grow old poor.
+However, evidence from recent data indicates that this development model based on simple "labor force accumulation" ran its course before the nation could benefit from the opportunity. If Brazil does not get rich soon, it will grow old poor.
 
 ## 2. The Demographic Turning Point: The Growth Constraint
 
-The Demographic Dependency Ratio (DDR) measures the proportion of the inactive population (children aged 0 to 14 and elderly over 65) relative to the potentially productive population (15 to 64 years old). This indicator was chosen over labor market-focused metrics, such as the Economically Active Population (EAP), because it mitigates the short-term effects of economic cycle fluctuations. The DDR allows us to observe the "installed capacity" and the maximum physical limit of the Brazilian workforce, free from cyclical noise.
+The Demographic Dependency Ratio (DDR) measures the proportion of the inactive population (children aged 0 to 14 and elderly over 65) relative to the potentially productive population (15 to 64 years old). This indicator was chosen over labor market-focused metrics, such as the Economically Active Population (EAP), because it mitigates the short-term effects of economic cycle fluctuations. The DDR makes it possible to observe the "installed capacity" and the maximum physical limit of the Brazilian workforce, free from cyclical noise.
 
-Analyzing the continuous PNAD time series, we observe the formation of a clear "U" curve. The year 2017 marked the historical minimum of this indicator and a definitive inflection point. From that moment on, the trend reversed: driven by population aging, the proportion of dependents began to grow again. Brazil has closed its demographic dividend window.
+Analyzing the continuous PNAD time series, a clear 'U' curve emerges. The year 2017 marked the historical minimum of this indicator and a definitive inflection point. From that moment on, the trend reversed: driven by population aging, the proportion of dependents began to grow again. At this point, Brazil has closed its demographic dividend window.
 
 ```{r}
 #| fig-align: center
@@ -57,7 +59,7 @@ razao_dependencia <- ipeadata("ADH12_RAZDEP") %>%
 # Plotting the chart
 ggplot(razao_dependencia, aes(x = date, y = razao_dependencia_pct)) +
   geom_line(linewidth = 1.2, color = "darkred") + 
-  geom_point(size = 2, color = "darkred") +
+  geom_point(size = 0, color = "darkred") +
   labs(
     title = "The Demographic Turning Point: Dependency Ratio in Brazil",
     subtitle = "Inactive population (0-14 and 65+ years) per 100 working-age people",
@@ -73,7 +75,7 @@ ggplot(razao_dependencia, aes(x = date, y = razao_dependencia_pct)) +
 
 The World Bank's World Development Report 2024 warns that, in the face of aging, middle-income countries can no longer rely on the simple addition of the labor force; it is imperative to transition to growth via technological infusion and efficiency.
 
-However, since 2013, the real productivity of the Brazilian worker has not moved: we have been stuck in the range of R\$ 45,000 annually (at constant prices). Each worker produces the same volume of wealth to be divided among increasingly more dependents. Brazil has failed to generate the efficiency leap necessary to compensate for its aging.
+However, since 2013, the real productivity of the Brazilian worker has been stuck in the range of R\$ 45,000 annually (at constant prices). Each worker produces the same volume of wealth to be divided among increasingly more dependents. Simply put, this means that Brazil has failed to generate the efficiency leap necessary to compensate for its aging.
 
 ```{r}
 #| fig-align: center
@@ -88,7 +90,7 @@ tabela_produtividade <- ipeadata("SCN10_PIBP10") %>%
 
 ggplot(tabela_produtividade, aes(x = date, y = produtividade_trabalho)) +
   geom_line(linewidth = 1.2, color = "darkblue") +
-  geom_point(size = 2, color = "darkblue") +
+  geom_point(size = 0, color = "darkblue") +
   scale_y_continuous(limits = c(0, 100), labels = scales::comma) +
   labs(
     title = "Evolution of Labor Productivity in Brazil",
@@ -103,7 +105,7 @@ ggplot(tabela_produtividade, aes(x = date, y = produtividade_trabalho)) +
 
 ## 4. Global Benchmark and the Institutional Abyss
 
-To understand the severity of this stagnation, we established a global control group: Chile as a regional mirror in commodity dependence; Poland and South Korea, which broke the middle-income trap through integration into global value chains and elite human capital; and Vietnam, which is experiencing its demographic peak based on technological infusion (serving as an example of truly leveraging the demographic dividend, instead of generating a dependent economy as was the case in Brazil).
+To understand the severity of this stagnation, this study establishes a comparative benchmark group: Chile as a regional mirror in commodity dependence; Poland and South Korea, which broke the middle-income trap through integration into global value chains and elite human capital; and Vietnam, which is experiencing its demographic peak based on technological infusion (serving as an example of truly leveraging the demographic dividend, instead of generating a dependent economy as was the case in Brazil).
 
 ```{r}
 #| message: false
@@ -111,10 +113,20 @@ To understand the severity of this stagnation, we established a global control g
 
 benchmark_data <- tibble(
   Country = c("Vietnam", "Poland", "South Korea", "Chile", "Brazil"),
-  `Productivity (2013)` = c("US\\$ 14,359", "US\\$ 67,516", "US\\$ 84,089", "US\\$ 59,309", "US\\$ 41,958"),
-  `Final Productivity` = c("US\\$ 26,057", "US\\$ 92,968", "US\\$ 98,259", "US\\$ 64,104", "US\\$ 41,441"),
+  `Productivity 2013` = c("US\\$ 14,359", "US\\$ 67,516", "US\\$ 84,089", "US\\$ 59,309", "US\\$ 41,958"),
+  `Productivity 2024` = c("US\\$ 26,057", "US\\$ 92,968", "US\\$ 98,259", "US\\$ 64,104", "US\\$ 41,441"),
   `Percentage Change` = c("+81.5%", "+37.7%", "+16.9%", "+8.09%", "-1.23%")
 )
+
+```{r}
+#| results: asis
+#| message: false
+#| warning: false
+
+```{r}
+#| results: asis
+#| message: false
+#| warning: false
 
 benchmark_data %>%
   mutate(
@@ -124,34 +136,200 @@ benchmark_data %>%
       bold = TRUE
     )
   ) %>%
-  kable(format = "latex", escape = FALSE, align = "c", booktabs = TRUE) %>%
+  kable(
+    format = "latex", 
+    escape = FALSE, 
+    align = "c", 
+    booktabs = TRUE,
+    caption = "Source: World Bank WDI (Constant 2021 PPP US\\$ per person employed)."
+  ) %>%
   kable_styling(latex_options = c("HOLD_position"))
 ```
 
-It is clear that we are the only country on the list in the red. Why does this happen? The answer lies not in the absence of talent, but in the institutional rules of the game.
+It is clear that Brazil is the only country on the list experiencing a net contraction. Why does this happen? The answer lies not in the absence of talent, but in the institutional rules of the game.
 
-As pointed out by William Baumol in his theory on the allocation of talent, the institutional framework dictates whether the brightest minds of a society will focus on innovation or rent-seeking. In Brazil, the tax complexity described by Douglass North (transaction costs) and the barriers to creative destruction (Acemoglu & Robinson) punish productive entrepreneurship. Instead of creating cutting-edge technology, our intellectual elites are incentivized to seek stability in the public sector, arbitrage the legal system, or migrate abroad.
+As pointed out by William Baumol (1990) in his theory on the allocation of talent, the institutional framework dictates whether the brightest minds of a society will focus on innovation or rent-seeking. In Brazil, the tax complexity described by Douglass North (1990) regarding transaction costs and the barriers to creative destruction (Acemoglu & Robinson, 2012) punish productive entrepreneurship. Instead of creating cutting-edge technology, domestic intellectual elites are incentivized to seek stability in the public sector, arbitrage the legal system, or migrate abroad.
 
-## 5. Conclusion: The Middle-Income Trap
+## 5. Sectoral Dynamics: Productivity Divergence and Workforce Absorption
 
-The overlap of a rapidly aging population with a worker whose capacity to generate wealth is cemented consolidates the classic scenario of the Middle-Income Trap (Gill & Kharas, 2007). With the irreversible exhaustion of the demographic dividend, Brazil urgently needs to overcome its institutional constraints to unlock technological innovation. Otherwise, the country runs the grave risk of becoming structurally old before managing to get rich.
+While the aggregate productivity index illustrates macroeconomic stagnation, it masks critical structural heterogeneities within the Brazilian economy. To uncover which sectors drive or anchor national performance, this analysis harmonizes quarterly Gross Value Added (GVA) data from the System of Quarterly National Accounts (IBGE/SCNT Table 6612) with sectoral workforce absorption series from the Continuous PNAD (IBGE/SIDRA Table 5434).
 
-## 6. Limitations and Recommendations
+```{r}
+#| label: sectoral-productivity
+#| fig-align: center
+#| fig-width: 8.5
+#| fig-height: 5
 
-We recognize that the aggregate productivity index masks structural heterogeneities in the Brazilian economy. Based on this, the following next steps for the research are proposed:
+# ==================================================================
+# 1. DATA EXTRACTION VIA SIDRA API (Time Series since 2013)
+# ==================================================================
 
-1.  **Sectoral Decomposition:** Use labor productivity microdata to identify which specific industries are operating as anchors on the national average, testing the technological gap against international benchmarks.
+# Table 6612: Chained values at 1995 prices (Millions of Reais - Real Volume)
+raw_gva <- get_sidra(api = "/t/6612/n1/all/v/all/p/all/c11255/90687,90691,90694,90696,90697,90698,90699,90700,90701,90702,90703")
 
-2.  **Institutional Impact on Talent Allocation:** Quantitatively investigate the correlation between local transaction costs (such as tax complexity and entry barriers) and the flight of elite human capital, measuring the real cost of our laws on the capacity to innovate.
+# Table 5434: Employed persons by activity group (Thousand persons - Continuous PNAD)
+raw_emp <- get_sidra(api = "/t/5434/n1/all/v/4090/p/all/c888/47947,47948,47949,47950,56622,56623,56624,60032")
+
+# ==================================================================
+# 2. SECTORAL HARMONIZATION (Aligning QNA with Continuous PNAD)
+# ==================================================================
+
+# Since PNAD groups Manufacturing, Extractive, and Utilities into "General Industry",
+# we harmonize the 6 major compatible blocks across both surveys:
+
+clean_gva <- raw_gva %>%
+  filter(`Trimestre (Código)` >= "201301") %>%
+  mutate(sector = case_when(
+    `Setores e subsetores (Código)` == 90687 ~ "Agriculture",
+    `Setores e subsetores (Código)` == 90691 ~ "General Industry",
+    `Setores e subsetores (Código)` == 90694 ~ "Construction",
+    `Setores e subsetores (Código)` == 90697 ~ "Commerce",
+    `Setores e subsetores (Código)` == 90698 ~ "Transport & Mail",
+    `Setores e subsetores (Código)` %in% c(90699, 90700, 90701, 90702, 90703) ~ "Other Services (IT, Finance, Public Admin)",
+    TRUE ~ NA_character_
+  )) %>%
+  filter(!is.na(sector)) %>%
+  group_by(quarter_code = `Trimestre (Código)`, sector) %>%
+  summarise(real_gva = sum(Valor, na.rm = TRUE), .groups = "drop")
+
+clean_emp <- raw_emp %>%
+  # Automatically locate the activity group code column and rename to sector_code
+  rename_with(~ "sector_code", matches("Grupamento.*\\(Código\\)")) %>%
+  filter(`Trimestre (Código)` >= "201301") %>%
+  mutate(
+    sector_code = as.numeric(sector_code),
+    sector = case_when(
+      sector_code == 47947 ~ "Agriculture",
+      sector_code == 47948 ~ "General Industry",
+      sector_code == 47949 ~ "Construction",
+      sector_code == 47950 ~ "Commerce",
+      sector_code == 56622 ~ "Transport & Mail",
+      sector_code %in% c(56623, 56624, 60032) ~ "Other Services (IT, Finance, Public Admin)",
+      TRUE ~ NA_character_
+    )
+  ) %>%
+  filter(!is.na(sector)) %>%
+  group_by(quarter_code = `Trimestre (Código)`, sector) %>%
+  summarise(employed = sum(Valor, na.rm = TRUE), .groups = "drop")
+
+# ==================================================================
+# 3. SECTORAL PRODUCTIVITY CALCULATION (2013-2025)
+# ==================================================================
+
+sectoral_productivity <- inner_join(clean_gva, clean_emp, by = c("quarter_code", "sector")) %>%
+  mutate(year = as.numeric(substr(quarter_code, 1, 4))) %>%
+  # Exclude incomplete 2026 observations
+  filter(year <= 2025) %>% 
+  group_by(year, sector) %>%
+  summarise(
+    annual_gva = sum(real_gva),
+    avg_employed = mean(employed),
+    productivity = annual_gva / avg_employed,
+    .groups = "drop"
+  ) %>%
+  group_by(sector) %>%
+  mutate(index_2013 = (productivity / productivity[year == 2013]) * 100) %>%
+  ungroup()
+
+# ==================================================================
+# 4. PLOT 1: REAL LABOR PRODUCTIVITY BY SECTOR
+# ==================================================================
+
+ggplot(sectoral_productivity, aes(x = year, y = index_2013, color = sector)) +
+  geom_line(linewidth = 1.2) +
+  geom_point(size = 0) +
+  scale_x_continuous(breaks = seq(2013, 2025, by = 2)) +
+  labs(
+    title = "Real Labor Productivity Decomposition in Brazil (2013–2025)",
+    subtitle = "Chained volume index (2013 = 100) across major economic sectors",
+    x = "Year",
+    y = "Productivity Index (2013 = 100)",
+    color = "Economic Sector",
+    caption = "Source: Elaborated with IBGE data (SCNT Table 6612 and Continuous PNAD Table 5434)."
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    plot.title = element_text(face = "bold", size = 14),
+    legend.position = "bottom",
+    legend.title = element_blank(),
+    axis.title.y = element_text(size = 10)
+  ) +
+  guides(color = guide_legend(nrow = 2))
+```
+
+Decomposing the macroeconomic data into two dimensions (real productivity growth and workforce absorption) reveals a deep structural failure. As the first chart demonstrates, only the agricultural sector experienced a sustained productivity boom since 2013, while General Industry, Commerce, and Services remained stagnant or contracted. However, because modern agribusiness is highly capital- and land-intensive, its efficiency gains naturally shed labor rather than absorbing the broader workforce.
+
+```{r}
+#| label: workforce-absorption
+#| fig-align: center
+#| fig-width: 8.5
+#| fig-height: 5
+
+# ==================================================================
+# 5. PLOT 2: WORKFORCE ABSORPTION SHARE BY SECTOR (MISALLOCATION)
+# ==================================================================
+
+employment_share_table <- clean_emp %>%
+  filter(as.numeric(substr(quarter_code, 1, 4)) <= 2025) %>%
+  group_by(quarter_code) %>%
+  mutate(
+    total_employed = sum(employed, na.rm = TRUE),
+    employment_share = (employed / total_employed) * 100
+  ) %>%
+  ungroup() %>%
+  # Convert '201301' string format into continuous decimal year for smooth X-axis plotting
+  mutate(
+    year_plot = as.numeric(substr(as.character(quarter_code), 1, 4)) + 
+      (as.numeric(substr(as.character(quarter_code), 5, 6)) - 1) / 4
+  )
+
+ggplot(employment_share_table, aes(x = year_plot, y = employment_share, color = sector)) +
+  geom_line(linewidth = 1.2) +
+  geom_point(size = 0) +
+  scale_y_continuous(labels = function(x) paste0(x, "%")) +
+  scale_x_continuous(breaks = seq(2013, 2025, by = 2)) + 
+  labs(
+    title = "Labor Misallocation: Workforce Absorption by Sector",
+    subtitle = "Share of total employed population (%) in Brazil",
+    x = "Year",
+    y = "Share of Total Employment (%)",
+    caption = "Source: Elaborated with IBGE/SIDRA Continuous PNAD data (Table 5434)."
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    plot.title = element_text(face = "bold", size = 14),
+    legend.position = "bottom",
+    legend.title = element_blank()
+  ) +
+  guides(color = guide_legend(nrow = 2))
+```
+
+In a healthy structural transformation, labor released from primary activities transitions into high-tech manufacturing and modern tradable sectors. Instead, as the second chart reveals, the Brazilian workforce has steadily migrated away from agriculture and industrial activities, becoming heavily concentrated in the broad "Other Services" category, which alone absorbs over 40% of total employment (and over 65% when combined with Commerce and Transport) despite stagnant real productivity growth.
+
+A compelling microeconomic hypothesis for this sluggish structural transformation lies in firm-level wage dynamics. Investigating the 1996–2012 period with linked employer-employee data (RAIS), Alvarez, Benguria, Engbom, and Moser (2018) documented a substantial compression in firm productivity pay premiums, a key driver of falling earnings inequality at the time. This raises a critical question for the post-2013 stagnation: when productive industrial firms face high institutional transaction costs (North, 1990) alongside compressed wage-setting differentials, does the labor market lose the price signal required to pull workers out of rent-seeking and low-growth service activities (Baumol, 1990)?
+
+## 6. Conclusion: The Middle-Income Trap
+
+The overlap of a rapidly aging population with a workforce trapped in low-productivity sectors consolidates the classic scenario of the Middle-Income Trap (Gill & Kharas, 2007). With the irreversible closure of its demographic dividend window in 2017, Brazil can no longer rely on labor force accumulation to drive GDP growth. Overcoming this stagnation requires dismantling the institutional bottlenecks and transaction costs that suppress firm-level productivity pay premiums (Alvarez et al., 2018) and distort the allocation of talent. Otherwise, Brazil runs the grave risk of becoming structurally old before managing to get rich.
+
+## 7. Limitations and Future Research Agenda
+
+While the sectoral decomposition advances the understanding of Brazilian stagnation, macro-level survey data presents inherent aggregation limits—most notably within the IBGE "Other Services" category, which groups informal low-skill activities alongside high-income financial services and public administration. To isolate these effects and further test the institutional hypotheses of North (1990) and Baumol (1990), the next phase of this research will pursue two empirical fronts:
+
+1.  **Econometric Modeling of the "Brazil Cost" and Brain Drain:** Quantitatively investigating the correlation between domestic institutional friction (such as tax compliance hours, regulatory entry barriers, and legal transaction costs) and the flight of elite human capital. By crossing international migration metrics with sectoral skill premia, this step aims to measure the real economic cost of regulatory complexity on domestic innovation capacity.
+
+2.  **Disaggregating Service-Sector Rent-Seeking vs. Productive Premia:** Transitioning from aggregate IBGE series to linked employer-employee administrative microdata (following the empirical framework of Alvarez, Benguria, Engbom, & Moser, 2018) to separate public administration wage premiums from private-sector productivity gains. This framework will make it possible to test whether high-skill talent remaining in Brazil is being disproportionately absorbed by public-sector stability rather than dynamic private firms.
 
 ## References
 
 - **ACEMOGLU, D.; ROBINSON, J. A.** *Why Nations Fail: The Origins of Power, Prosperity, and Poverty*. Crown Business, 2012.
 
-- **BAUMOL, W. J.** *Entrepreneurship: Productive, Unproductive, and Destructive*. Journal of Political Economy, 1990.
+- **ALVAREZ, J.; BENGURIA, F.; ENGBOM, N.; MOSER, C.** *Firms and the Decline of Earnings Inequality in Brazil*. American Economic Journal: Macroeconomics, 10 (1): 149–89, 2018.
 
-- **WORLD BANK.** *World Development Report 2024: The Middle Income Trap*. Washington, DC: World Bank, 2024.
+- **BAUMOL, W. J.** *Entrepreneurship: Productive, Unproductive, and Destructive*. Journal of Political Economy, 98 (5): 893–921, 1990.
 
 - **GILL, I.; KHARAS, H.** *An East Asian Renaissance: Ideas for Economic Growth*. Washington, DC: World Bank, 2007.
 
 - **NORTH, D. C.** *Institutions, Institutional Change and Economic Performance*. Cambridge University Press, 1990.
+
+- **WORLD BANK.** *World Development Report 2024: The Middle Income Trap*. Washington, DC: World Bank, 2024.
